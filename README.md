@@ -1,7 +1,5 @@
 # CBin-NN Inference Engine
 
-[![CBin-NN Build & Test](https://github.com/Edge-Learning-Machine/CBin-NN/actions/workflows/build.yml/badge.svg)](https://github.com/Edge-Learning-Machine/CBin-NN/actions/workflows/build.yml)
-
 **CBin-NN** is an open-source framework for running Binarized Neural Networks (BNNs) on resource-constrained devices, such as Microcontroller Units (MCUs).
 
 ## Hybrid Packaging (Python + C)
