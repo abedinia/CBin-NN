@@ -1,12 +1,15 @@
 import os
 import numpy as np
 
-if os.path.exists("bnn_params.h"): 
-    os.remove("bnn_params.h") 
-if os.path.exists("bnn_params.c"): 
-    os.remove("bnn_params.c") 
-if os.path.exists("CBin-NN.c"): 
-    os.remove("CBin-NN.c") 
+def initialize_files(output_dir):
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+        
+    files_to_remove = ["bnn_params.h", "bnn_params.c", "CBin-NN.c"]
+    for file_name in files_to_remove:
+        file_path = os.path.join(output_dir, file_name)
+        if os.path.exists(file_path):
+            os.remove(file_path) 
 
 def createArray(type, arrName, arr, n_elements):
     stri = f'{type} {arrName}[{n_elements}] = {{'
@@ -18,8 +21,8 @@ def createArray(type, arrName, arr, n_elements):
     stri = stri.replace(',}', '}')
     return stri
 
-def save_bnn_params(weights, bias, layer_name, layer_idx, in_shape, out_shape, ker_size, stride, padding, first_file_write, in_buffer, out_buffer, BN_idx):
-    myFile = open(f"bnn_params.h","a+")
+def save_bnn_params(weights, bias, layer_name, layer_idx, in_shape, out_shape, ker_size, stride, padding, first_file_write, in_buffer, out_buffer, BN_idx, output_dir):
+    myFile = open(os.path.join(output_dir, "bnn_params.h"), "a+")
     if layer_name.startswith('QBConv2D') or layer_name.startswith('QBConv2D_Optimized') or layer_name.startswith('QBConv2D_Optimized_PReLU') or layer_name.startswith('BBConv2D') or layer_name.startswith('BBConv2D_Optimized') or layer_name.startswith('BBConv2D_Optimized_PReLU') or layer_name.startswith('BBPointwiseConv2D') or layer_name.startswith('BBPointwiseConv2D_Optimized') or layer_name.startswith('BBPointwiseConv2D_Optimized_PReLU'):
         conv_wt = 'CONV' + str(layer_idx) + '_WT'
         conv_bias = 'CONV' + str(layer_idx) + '_BIAS'
@@ -68,7 +71,7 @@ def save_bnn_params(weights, bias, layer_name, layer_idx, in_shape, out_shape, k
             myFile.write(f"\n")
         myFile.close()
 
-        myFile = open(f"bnn_params.c","a+")
+        myFile = open(os.path.join(output_dir, "bnn_params.c"), "a+")
         if first_file_write == True:
             myFile.write(f"#include \"bnn_params.h\"\n")
         stri = createArray('int', conv_wt.lower(), bit_packed_weights, 'N_'+conv_wt)
@@ -80,12 +83,12 @@ def save_bnn_params(weights, bias, layer_name, layer_idx, in_shape, out_shape, k
             myFile.write(f"\n")
         myFile.close()
 
-        myFile = open(f"CBin-NN.c","a+")
+        myFile = open(os.path.join(output_dir, "CBin-NN.c"), "a+")
         if first_file_write == True:
             myFile.write(f"#include \"CBin-NN.h\"\n\n")
-            myFile.write(f"int buffer1[N_BUFFER1]\n")
-            myFile.write(f"int buffer2[N_BUFFER1]\n")
-            myFile.write(f"float classification[N_CLASSES]\n\n")
+            myFile.write(f"int buffer1[N_BUFFER1];\n")
+            myFile.write(f"int buffer2[N_BUFFER1];\n")
+            myFile.write(f"float classification[N_CLASSES];\n\n")
             myFile.write(f"int bnn_main()\n")
             stri = '{'
             myFile.write(stri)
@@ -146,7 +149,7 @@ def save_bnn_params(weights, bias, layer_name, layer_idx, in_shape, out_shape, k
             myFile.write(f"\n")
         myFile.close()
 
-        myFile = open(f"bnn_params.c","a+")
+        myFile = open(os.path.join(output_dir, "bnn_params.c"), "a+")
         if first_file_write == True:
             myFile.write(f"#include \"bnn_params.h\"\n")
         stri = createArray('int8_t', conv_wt.lower(), weights, 'N_'+conv_wt)
@@ -158,12 +161,12 @@ def save_bnn_params(weights, bias, layer_name, layer_idx, in_shape, out_shape, k
             myFile.write(f"\n")
         myFile.close()
 
-        myFile = open(f"CBin-NN.c","a+")
+        myFile = open(os.path.join(output_dir, "CBin-NN.c"), "a+")
         if first_file_write == True:
             myFile.write(f"#include \"CBin-NN.h\"\n\n")
-            myFile.write(f"int buffer1[N_BUFFER1]\n")
-            myFile.write(f"int buffer2[N_BUFFER1]\n")
-            myFile.write(f"float classification[N_CLASSES]\n\n")
+            myFile.write(f"int buffer1[N_BUFFER1];\n")
+            myFile.write(f"int buffer2[N_BUFFER1];\n")
+            myFile.write(f"float classification[N_CLASSES];\n\n")
             myFile.write(f"int bnn_main()\n")
             stri = '{'
             myFile.write(stri)
@@ -211,7 +214,7 @@ def save_bnn_params(weights, bias, layer_name, layer_idx, in_shape, out_shape, k
             myFile.write(f"\n")
         myFile.close()
 
-        myFile = open(f"bnn_params.c","a+")
+        myFile = open(os.path.join(output_dir, "bnn_params.c"), "a+")
         stri = createArray('int', fc_wt.lower(), bit_packed_weights, 'N_'+fc_wt)
         myFile.write(stri)
         myFile.write(f"\n")
@@ -221,12 +224,12 @@ def save_bnn_params(weights, bias, layer_name, layer_idx, in_shape, out_shape, k
             myFile.write(f"\n")
         myFile.close()
 
-        myFile = open(f"CBin-NN.c","a+")
+        myFile = open(os.path.join(output_dir, "CBin-NN.c"), "a+")
         if first_file_write == True:
             myFile.write(f"#include \"CBin-NN.h\"\n\n")
-            myFile.write(f"int buffer1[N_BUFFER1]\n")
-            myFile.write(f"int buffer2[N_BUFFER1]\n")
-            myFile.write(f"float classification[N_CLASSES]\n\n")
+            myFile.write(f"int buffer1[N_BUFFER1];\n")
+            myFile.write(f"int buffer2[N_BUFFER1];\n")
+            myFile.write(f"float classification[N_CLASSES];\n\n")
             myFile.write(f"int bnn_main()\n")
             stri = '{'
             myFile.write(stri)
@@ -240,15 +243,15 @@ def save_bnn_params(weights, bias, layer_name, layer_idx, in_shape, out_shape, k
             myFile.write(f"\t{layer_name}({out_buffer}, {out_dim}, {in_dim}, NULL, {fc_wt.lower()}, {bn_wt.lower()}, {PReLU_shift.lower()}, {in_buffer});\n")
         if layer_name == 'BBQFC':
             myFile.write(f"\t{layer_name}(classification, {out_dim}, {in_dim}, NULL, {fc_wt.lower()}, {bn_wt.lower()}, {in_buffer});\n")
-            stri = '}'
+            stri = '\treturn 0;\n}'
             myFile.write(stri)
         elif layer_name == 'BBQFC_Optimized':
             myFile.write(f"\t{layer_name}(classification, {out_dim}, {in_dim}, NULL, {fc_wt.lower()}, {bn_wt.lower()}, {in_buffer});\n")
-            stri = '}'
+            stri = '\treturn 0;\n}'
             myFile.write(stri)
         elif layer_name == 'BBQFC_Optimized_PReLU':
             myFile.write(f"\t{layer_name}(classification, {out_dim}, {in_dim}, NULL, {fc_wt.lower()}, {bn_wt.lower()}, {PReLU_shift.lower()}, {in_buffer});\n")
-            stri = '}'
+            stri = '\treturn 0;\n}'
             myFile.write(stri)
         myFile.close()
     
@@ -270,7 +273,7 @@ def save_bnn_params(weights, bias, layer_name, layer_idx, in_shape, out_shape, k
             myFile.write(f"\n")
         myFile.close()
 
-        myFile = open(f"bnn_params.c","a+")
+        myFile = open(os.path.join(output_dir, "bnn_params.c"), "a+")
         stri = createArray('int8_t', fc_wt.lower(), bit_packed_weights, 'N_'+fc_wt)
         myFile.write(stri)
         myFile.write(f"\n")
@@ -291,7 +294,7 @@ def save_bnn_params(weights, bias, layer_name, layer_idx, in_shape, out_shape, k
         myFile.write(f"\n")
         myFile.close()
 
-        myFile = open(f"bnn_params.c","a+")
+        myFile = open(os.path.join(output_dir, "bnn_params.c"), "a+")
         stri = createArray('float', alpha1_wt.lower(), weights[0], 'N_'+alpha1_wt)
         myFile.write(stri)
         myFile.write(f"\n")
@@ -307,7 +310,7 @@ def save_bnn_params(weights, bias, layer_name, layer_idx, in_shape, out_shape, k
         myFile.write(f"\n")
         myFile.close()
 
-        myFile = open(f"bnn_params.c","a+")
+        myFile = open(os.path.join(output_dir, "bnn_params.c"), "a+")
         stri = createArray('float', bn_wt.lower(), weights, 'N_'+bn_wt)
         myFile.write(stri)
         myFile.write(f"\n")
@@ -320,7 +323,7 @@ def save_bnn_params(weights, bias, layer_name, layer_idx, in_shape, out_shape, k
         myFile.write(f"\n")
         myFile.close()
 
-        myFile = open(f"bnn_params.c","a+")
+        myFile = open(os.path.join(output_dir, "bnn_params.c"), "a+")
         stri = createArray('float', PReLU_shift.lower(), weights, 'N_'+PReLU_shift)
         myFile.write(stri)
         myFile.write(f"\n")
@@ -343,12 +346,12 @@ def save_bnn_params(weights, bias, layer_name, layer_idx, in_shape, out_shape, k
         myFile.write(f"\n")
         myFile.close()
 
-        myFile = open(f"CBin-NN.c","a+")
+        myFile = open(os.path.join(output_dir, "CBin-NN.c"), "a+")
         if first_file_write == True:
             myFile.write(f"#include \"CBin-NN.h\"\n\n")
-            myFile.write(f"int buffer1[N_BUFFER1]\n")
-            myFile.write(f"int buffer2[N_BUFFER1]\n")
-            myFile.write(f"float classification[N_CLASSES]\n\n")
+            myFile.write(f"int buffer1[N_BUFFER1];\n")
+            myFile.write(f"int buffer2[N_BUFFER1];\n")
+            myFile.write(f"float classification[N_CLASSES];\n\n")
             myFile.write(f"int bnn_main()\n")
             stri = '{'
             myFile.write(stri)
