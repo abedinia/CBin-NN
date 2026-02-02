@@ -66,6 +66,13 @@ gcc main.c -Lbuild -lcbinnn -I cbin_nn/operators -I models -lm -o my_app
 *   **TensorFlow**, **Larq**, **NumPy**
 *   **GCC** or other standard C compiler
 
+## Performance & Results
+
+Below are benchmark results demonstrating the efficiency and output of the CBin-NN engine:
+
+![Performance Benchmark 1](assets/result1.png)
+![Performance Benchmark 2](assets/result2.png)
+
 ## Support or Contact
 
 For more information, see our [IEEE EDGE 2022 paper](https://scholar.google.com/citations?view_op=view_citation&hl=en&user=x3TEgPQAAAAJ&citation_for_view=x3TEgPQAAAAJ:qjMakFHDy7sC).
